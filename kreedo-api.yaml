@@ -1,0 +1,268 @@
+openapi: 3.0.0
+info:
+  title: "Kreedo Curriculum API"
+  description: "API for fetching school curriculum data including grades, subjects, and activities."
+  version: "1.0.0"
+servers:
+  - url: "https://6t.kreedo.solutions"
+    description: "Production Server"
+
+paths:
+  /api/plan/grades_by_school/{school_id}:
+    get:
+      summary: "Get Grades by School"
+      description: "Retrieves a list of all grades associated with a given school ID."
+      tags:
+        - "Curriculum"
+      parameters:
+        - name: "school_id"
+          in: "path"
+          required: true
+          description: "The ID of the school."
+          schema:
+            type: "integer"
+            example: 2078
+        - name: "type"
+          in: "query"
+          required: true
+          description: "The type of user making the request."
+          schema:
+            type: "string"
+            example: "school_associate"
+        - name: "user_id"
+          in: "query"
+          required: true
+          description: "The ID of the user."
+          schema:
+            type: "integer"
+            example: 169776
+      responses:
+        '200':
+          description: "A successful response with a list of grades."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: "integer"
+                    example: 200
+                  isSuccess:
+                    type: "boolean"
+                    example: true
+                  message:
+                    type: "string"
+                    example: "grades_by_school"
+                  data:
+                    type: "array"
+                    items:
+                      $ref: '#/components/schemas/Grade'
+
+  /api/curriculum/school_subject_list:
+    get:
+      summary: "Get School Subject List"
+      description: "Retrieves the subjects for a specific grade within a school."
+      tags:
+        - "Curriculum"
+      parameters:
+        - name: "grade"
+          in: "query"
+          required: true
+          description: "The ID of the grade."
+          schema:
+            type: "integer"
+            example: 1
+        - name: "school"
+          in: "query"
+          required: true
+          description: "The ID of the school."
+          schema:
+            type: "integer"
+            example: 2078
+        - name: "type"
+          in: "query"
+          required: true
+          description: "The type of user."
+          schema:
+            type: "string"
+            example: "school_associate"
+        - name: "user_id"
+          in: "query"
+          required: true
+          description: "The ID of the user."
+          schema:
+            type: "integer"
+            example: 169776
+        - name: "is_kreedo"
+          in: "query"
+          required: true
+          description: "Filter for Kreedo subjects."
+          schema:
+            type: "boolean"
+            example: true
+      responses:
+        '200':
+          description: "A successful response with a list of subjects for the grade."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  statusCode:
+                    type: "integer"
+                    example: 200
+                  isSuccess:
+                    type: "boolean"
+                    example: true
+                  message:
+                    type: "string"
+                    example: "school_subject_list"
+                  data:
+                    type: "array"
+                    items:
+                      $ref: '#/components/schemas/Subject'
+  
+  /api/plan/get_activity_list_by_tag:
+    post:
+      summary: "Get Activity List by Tag"
+      description: "Retrieves all activities associated with a subject's plan."
+      tags:
+        - "Curriculum"
+      parameters:
+        - name: "block_no"
+          in: "query"
+          description: "Optional block number."
+          schema:
+            type: "string"
+        - name: "activity"
+          in: "query"
+          description: "Optional activity filter."
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        description: "Payload to specify the plan and subject."
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "plan"
+                - "subject"
+                - "act_tag_list"
+              properties:
+                plan:
+                  type: "integer"
+                  description: "The plan_id obtained from the 'Get School Subject List' endpoint."
+                  example: 162
+                subject:
+                  type: "integer"
+                  description: "The subject ID obtained from the 'Get School Subject List' endpoint."
+                  example: 87887
+                act_tag_list:
+                  type: "array"
+                  description: "An array of activity tag IDs. Use [0] to fetch all."
+                  items:
+                    type: "integer"
+                  example: [0]
+      responses:
+        '200':
+          description: "A successful response with a list of activities."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  isSuccess:
+                    type: "boolean"
+                    example: true
+                  message:
+                    type: "string"
+                    example: "Block Wise Plan Activity List"
+                  statusCode:
+                    type: "integer"
+                    example: 200
+                  data:
+                    type: "array"
+                    items:
+                      $ref: '#/components/schemas/Activity'
+
+components:
+  schemas:
+    Grade:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        grade_label:
+          type: "string"
+        grade_id:
+          type: "integer"
+        grade_name:
+          type: "string"
+        school:
+          type: "integer"
+      example:
+        id: 7347
+        grade_label: "Playgroup"
+        grade_id: 1
+        grade_name: "Playgroup"
+        school: 2078
+
+    Subject:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+        subject_label:
+          type: "string"
+        is_active:
+          type: "boolean"
+        non_kreedo_assessment:
+          type: "boolean"
+        is_marks:
+          type: "boolean"
+        is_grade:
+          type: "boolean"
+        school:
+          type: "object"
+          properties:
+            id:
+              type: "integer"
+            name:
+              type: "string"
+        subject:
+          type: "object"
+          properties:
+            id:
+              type: "integer"
+            name:
+              type: "string"
+        plan_id:
+          type: "integer"
+        create_blocks:
+          type: "boolean"
+      example:
+        id: 87887
+        subject_label: "Prewriting"
+        plan_id: 162
+
+    Activity:
+      type: "object"
+      properties:
+        activity:
+          type: "integer"
+        activity_name:
+          type: "string"
+        whatsapp_activity_name:
+          type: "string"
+        block_no:
+          type: "string"
+        block_name:
+          type: "string"
+      example:
+        activity: 14953
+        activity_name: "LV_0 Prewriting Introduction Activity 1"
+        whatsapp_activity_name: "L0: Prewriting IA 1"
+        block_no: ""
+        block_name: ""

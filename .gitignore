@@ -1,0 +1,37 @@
+# Virtual environment
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+
+# Large cached data — do not commit
+kreedo_responses/
+kreedo_downloads/
+prompt_out/
+prompt_out copy/
+
+# Generated output files
+kreedo_log.csv
+kreedo_assets.csv
+schedule.json
+fetch_activity
+html_to_pdf
+
+# Data / output text and HTML files
+*.html
+*-all.txt
+*-kreedo.txt
+promt.txt
+
+# Sensitive credentials — never commit
+little-graduates-3663b17fa316.json
+
+# Node
+package-lock.json
+node_modules/
